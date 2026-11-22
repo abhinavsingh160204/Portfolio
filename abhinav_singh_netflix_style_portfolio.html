@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABHINAV — Quantitative Finance & BFSI Portfolio</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Bebas Neue for authentic cinematic display headers -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            netflix: {
+              red: '#E50914',
+              redHover: '#F40612',
+              bg: '#141414',
+              card: '#181818',
+              cardHover: '#232323',
+              gray: '#808080',
+              lightGray: '#B3B3B3',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Bebas Neue', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Custom scrollbar hiding for horizontal Netflix content rows */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Smooth card hover zoom and shadow elevation */
+    .netflix-card {
+      transition: transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  box-shadow 0.32s ease,
+                  border-color 0.32s ease;
+    }
+    .netflix-card:hover {
+      transform: scale(1.045) translateY(-4px);
+      box-shadow: 0 18px 36px -10px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(229, 9, 20, 0.5);
+      z-index: 20;
+    }
+
+    /* Hero vignette gradients */
+    .hero-vignette-left {
+      background: linear-gradient(90deg, #141414 0%, rgba(20, 20, 20, 0.88) 38%, rgba(20, 20, 20, 0.25) 75%, rgba(20, 20, 20, 0.1) 100%);
+    }
+    .hero-vignette-bottom {
+      background: linear-gradient(180deg, rgba(20, 20, 20, 0) 0%, rgba(20, 20, 20, 0.65) 65%, #141414 100%);
+    }
+
+    /* Subtle animated ticker line in hero background */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 0.85; }
+    }
+    .animate-glow {
+      animation: pulseGlow 4s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-[#141414] text-white font-sans antialiased selection:bg-[#E50914] selection:text-white overflow-x-hidden">
+
+  <!-- Toast Notification Banner (replaces alert) -->
+  <div id="toast" class="fixed bottom-6 right-6 z-[100] hidden items-center gap-3 bg-[#181818] border border-neutral-700 text-white px-5 py-3.5 rounded-lg shadow-2xl transition-all duration-300">
+    <span class="w-2.5 h-2.5 rounded-full bg-[#E50914] animate-ping"></span>
+    <span id="toast-msg" class="text-sm font-medium">Copied to clipboard!</span>
+  </div>
+
+  <!-- Top Navigation Bar -->
+  <header id="navbar" class="fixed top-0 inset-x-0 z-50 transition-colors duration-300 bg-gradient-to-b from-black/90 via-black/60 to-transparent">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 h-16 sm:h-20 flex items-center justify-between gap-4">
+      <!-- Left: Netflix-style Wordmark & Nav Links -->
+      <div class="flex items-center gap-6 lg:gap-10">
+        <a href="#home" class="font-display text-3xl sm:text-4xl tracking-wider text-[#E50914] select-none hover:opacity-90 transition">
+          ABHINAV
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-neutral-300">
+          <a href="#home" class="text-white font-semibold hover:text-neutral-300 transition">Home</a>
+          <a href="#experience" class="hover:text-white transition">Experience</a>
+          <a href="#projects" class="hover:text-white transition">Projects</a>
+          <a href="#skills" class="hover:text-white transition">Skills</a>
+          <a href="#education" class="hover:text-white transition">Education</a>
+        </nav>
+      </div>
+
+      <!-- Right: My List Counter, Profile Switcher & Hire Me CTA -->
+      <div class="flex items-center gap-2.5 sm:gap-4">
+        <!-- My List Button -->
+        <button onclick="openMyListModal()" class="relative flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs sm:text-sm font-medium transition" title="View Shortlisted Items">
+          <i data-lucide="bookmark" class="w-4 h-4 text-[#E50914]"></i>
+          <span class="hidden sm:inline">My List</span>
+          <span id="mylist-count" class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] font-bold rounded-full bg-[#E50914] text-white">0</span>
+        </button>
+
+        <!-- Profile Switcher Dropdown -->
+        <div class="relative" id="profile-dropdown-container">
+          <button onclick="toggleProfileMenu()" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-neutral-900/90 border border-neutral-700/80 hover:border-neutral-500 transition text-xs sm:text-sm">
+            <div id="active-profile-avatar" class="w-6 h-6 sm:w-7 sm:h-7 rounded bg-gradient-to-br from-[#E50914] to-rose-900 flex items-center justify-center font-bold text-xs shadow">
+              R
+            </div>
+            <span id="active-profile-label" class="hidden lg:inline text-neutral-200 font-medium">Recruiter</span>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-neutral-400"></i>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="profile-menu" class="hidden absolute right-0 mt-2 w-60 rounded-xl bg-[#181818] border border-neutral-800 shadow-2xl py-2 z-50">
+            <div class="px-4 py-2 border-b border-neutral-800">
+              <p class="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold">Who's Watching?</p>
+            </div>
+            <button onclick="switchProfile('Recruiter', 'R', 'from-[#E50914] to-rose-900', 'Tailored for Financial Markets, Equity Research & BFSI Hiring Teams')" class="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-neutral-800/80 text-left transition">
+              <span class="w-7 h-7 rounded bg-gradient-to-br from-[#E50914] to-rose-900 flex items-center justify-center font-bold text-xs">R</span>
+              <div>
+                <p class="text-sm font-medium text-white">Recruiter</p>
+                <p class="text-[11px] text-neutral-400">Hiring & Role Fit View</p>
+              </div>
+            </button>
+            <button onclick="switchProfile('Fund Manager', 'F', 'from-emerald-600 to-teal-900', 'Highlighting 49% CAGR, <12% Max Drawdown & Multi-Indicator Alpha')" class="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-neutral-800/80 text-left transition">
+              <span class="w-7 h-7 rounded bg-gradient-to-br from-emerald-600 to-teal-900 flex items-center justify-center font-bold text-xs">F</span>
+              <div>
+                <p class="text-sm font-medium text-white">Fund Manager</p>
+                <p class="text-[11px] text-neutral-400">Portfolio & Alpha Metrics</p>
+              </div>
+            </button>
+            <button onclick="switchProfile('Tech Lead', 'T', 'from-blue-600 to-indigo-900', 'Highlighting SQL, Java, Python & 99%+ BFSI Data Accuracy')" class="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-neutral-800/80 text-left transition">
+              <span class="w-7 h-7 rounded bg-gradient-to-br from-blue-600 to-indigo-900 flex items-center justify-center font-bold text-xs">T</span>
+              <div>
+                <p class="text-sm font-medium text-white">Tech Lead</p>
+                <p class="text-[11px] text-neutral-400">Engineering & SQL Stack</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hire Me Badge -->
+        <button onclick="openContactModal()" class="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-lg bg-[#E50914] hover:bg-[#F40612] text-white text-xs sm:text-sm font-bold shadow-lg shadow-red-950/50 transition">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          <span>Hire Me</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Quick Jump Bar -->
+    <div class="flex md:hidden items-center justify-around border-t border-white/10 bg-[#141414]/95 backdrop-blur-md py-2 px-2 text-xs text-neutral-300">
+      <a href="#experience" class="hover:text-white px-2 py-1">Experience</a>
+      <a href="#projects" class="hover:text-white px-2 py-1">Projects</a>
+      <a href="#skills" class="hover:text-white px-2 py-1">Skills</a>
+      <a href="#education" class="hover:text-white px-2 py-1">Education</a>
+    </div>
+  </header>
+
+  <!-- HERO BILLBOARD SECTION -->
+  <section id="home" class="relative min-h-[88vh] sm:min-h-[92vh] flex items-center pt-24 pb-16 overflow-hidden">
+    <!-- Atmospheric Quantitative Chart & Dark Cinema Backdrop -->
+    <div class="absolute inset-0 z-0">
+      <!-- Subtle SVG Candlesticks & Equity Curve Art -->
+      <svg class="w-full h-full object-cover opacity-35 animate-glow" viewBox="0 0 1440 800" fill="none" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="curveGrad" x1="0" y1="0" x2="1440" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#E50914" stop-opacity="0.1" />
+            <stop offset="55%" stop-color="#E50914" stop-opacity="0.85" />
+            <stop offset="100%" stop-color="#10B981" stop-opacity="0.95" />
+          </linearGradient>
+          <linearGradient id="areaGrad" x1="0" y1="200" x2="0" y2="800" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#E50914" stop-opacity="0.25" />
+            <stop offset="100%" stop-color="#141414" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <!-- Grid lines -->
+        <g stroke="#ffffff" stroke-opacity="0.05" stroke-width="1">
+          <line x1="0" y1="160" x2="1440" y2="160" />
+          <line x1="0" y1="320" x2="1440" y2="320" />
+          <line x1="0" y1="480" x2="1440" y2="480" />
+          <line x1="0" y1="640" x2="1440" y2="640" />
+          <line x1="360" y1="0" x2="360" y2="800" />
+          <line x1="720" y1="0" x2="720" y2="800" />
+          <line x1="1080" y1="0" x2="1080" y2="800" />
+        </g>
+        <!-- Area & Growth Curve (4x Portfolio Growth 5L -> 20L) -->
+        <path d="M 120 690 Q 420 640, 680 510 T 1120 260 T 1420 110 L 1420 800 L 120 800 Z" fill="url(#areaGrad)" />
+        <path d="M 120 690 Q 420 640, 680 510 T 1120 260 T 1420 110" stroke="url(#curveGrad)" stroke-width="4" fill="none" />
+        <!-- Stylized Candlesticks on Right -->
+        <g opacity="0.65">
+          <line x1="880" y1="360" x2="880" y2="470" stroke="#10B981" stroke-width="2" />
+          <rect x="872" y="385" width="16" height="55" rx="2" fill="#10B981" />
+          <line x1="930" y1="330" x2="930" y2="430" stroke="#E50914" stroke-width="2" />
+          <rect x="922" y="350" width="16" height="45" rx="2" fill="#E50914" />
+          <line x1="980" y1="290" x2="980" y2="400" stroke="#10B981" stroke-width="2" />
+          <rect x="972" y="310" width="16" height="65" rx="2" fill="#10B981" />
+          <line x1="1030" y1="250" x2="1030" y2="350" stroke="#10B981" stroke-width="2" />
+          <rect x="1022" y="270" width="16" height="55" rx="2" fill="#10B981" />
+          <line x1="1080" y1="220" x2="1080" y2="310" stroke="#E50914" stroke-width="2" />
+          <rect x="1072" y="235" width="16" height="40" rx="2" fill="#E50914" />
+          <line x1="1130" y1="175" x2="1130" y2="275" stroke="#10B981" stroke-width="2" />
+          <rect x="1122" y="190" width="16" height="60" rx="2" fill="#10B981" />
+          <line x1="1180" y1="140" x2="1180" y2="230" stroke="#10B981" stroke-width="2" />
+          <rect x="1172" y="155" width="16" height="50" rx="2" fill="#10B981" />
+        </g>
+      </svg>
+      <div class="absolute inset-0 hero-vignette-left"></div>
+      <div class="absolute inset-0 hero-vignette-bottom"></div>
+    </div>
+
+    <!-- Foreground Hero Content -->
+    <div class="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 w-full">
+      <div class="max-w-3xl">
+        <!-- N-Series Badge -->
+        <div class="inline-flex items-center gap-2 mb-3">
+          <span class="font-display text-2xl text-[#E50914] tracking-widest">A</span>
+          <span class="text-xs sm:text-sm font-bold tracking-[0.28em] text-neutral-300 uppercase">Original Portfolio</span>
+        </div>
+
+        <!-- Featured Title -->
+        <h1 class="font-display text-5xl sm:text-7xl lg:text-8xl tracking-wide text-white leading-[0.95] drop-shadow-lg">
+          ABHINAV SINGH:<br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400">THE ALPHA &amp; THE CODE</span>
+        </h1>
+
+        <!-- Dynamic Profile Lens Banner -->
+        <p id="profile-lens-banner" class="mt-3 text-xs sm:text-sm text-emerald-400 font-medium flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Tailored for Financial Markets, Equity Research &amp; BFSI Hiring Teams</span>
+        </p>
+
+        <!-- Metadata Tags -->
+        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 mt-4 text-xs sm:text-sm font-semibold">
+          <span class="text-emerald-400 font-bold">99% Match</span>
+          <span class="text-neutral-300">2026</span>
+          <span class="px-2 py-0.5 border border-neutral-500 text-neutral-200 rounded text-xs">MBA Financial Markets</span>
+          <span class="px-2 py-0.5 border border-neutral-500 text-neutral-200 rounded text-xs">B.Tech CSE</span>
+          <span class="px-2.5 py-0.5 bg-[#E50914]/20 border border-[#E50914] text-red-300 rounded text-xs font-bold">49% CAGR</span>
+          <span class="px-2 py-0.5 bg-white/10 text-neutral-200 rounded text-xs">NISM-V-A Certified</span>
+        </div>
+
+        <!-- Executive Summary -->
+        <p class="mt-5 text-sm sm:text-base lg:text-lg text-neutral-200 leading-relaxed max-w-2xl font-normal">
+          Quantitative Equity Analyst, Computer Science Engineer, and former BFSI Technical Consultant for <strong class="text-white">Fidelity Investments</strong> &amp; <strong class="text-white">Wells Fargo</strong>. Proven track record of scaling a self-managed multi-asset portfolio <strong class="text-emerald-400">4x (₹5.0L to ₹20.0L)</strong> at <strong class="text-white">~49% annualized CAGR</strong> while maintaining <strong class="text-white">99%+ enterprise data accuracy</strong>.
+        </p>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4 mt-7">
+          <button onclick="openContactModal()" class="flex items-center gap-2.5 px-6 sm:px-7 py-3 sm:py-3.5 rounded-lg bg-white hover:bg-neutral-200 text-black font-bold text-sm sm:text-base shadow-xl transition transform active:scale-95">
+            <i data-lucide="play" class="w-5 h-5 fill-black"></i>
+            <span>View Resume / Contact</span>
+          </button>
+          <button onclick="openBioModal()" class="flex items-center gap-2.5 px-6 sm:px-7 py-3 sm:py-3.5 rounded-lg bg-neutral-600/70 hover:bg-neutral-600/90 backdrop-blur-md text-white font-bold text-sm sm:text-base transition transform active:scale-95">
+            <i data-lucide="info" class="w-5 h-5"></i>
+            <span>More Info</span>
+          </button>
+        </div>
+
+        <!-- Quick Key Metrics Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-9 pt-6 border-t border-white/15 max-w-2xl">
+          <div>
+            <p class="text-xl sm:text-2xl font-extrabold text-white">₹5L → ₹20L</p>
+            <p class="text-[11px] sm:text-xs text-neutral-400 mt-0.5">4x Portfolio Growth (3.5+ Yrs)</p>
+          </div>
+          <div>
+            <p class="text-xl sm:text-2xl font-extrabold text-emerald-400">~49% CAGR</p>
+            <p class="text-[11px] sm:text-xs text-neutral-400 mt-0.5">74% Peak 2-Yr Rolling CAGR</p>
+          </div>
+          <div>
+            <p class="text-xl sm:text-2xl font-extrabold text-white">&lt;12% Max DD</p>
+            <p class="text-[11px] sm:text-xs text-neutral-400 mt-0.5">1:2.5 Min Risk-Reward Rule</p>
+          </div>
+          <div>
+            <p class="text-xl sm:text-2xl font-extrabold text-[#E50914]">66.7% Win</p>
+            <p class="text-[11px] sm:text-xs text-neutral-400 mt-0.5">+₹27,263.53 Intraday P&amp;L</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CATALOG ROWS -->
+  <main class="relative z-20 -mt-6 sm:-mt-10 pb-20 space-y-12 sm:space-y-16 max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
+
+    <!-- ROW 1: Trending Now: Work Experience -->
+    <section id="experience" class="scroll-mt-24">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span>Trending Now: Work Experience</span>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-[#E50914]/20 text-[#E50914] border border-[#E50914]/40">2 Seasons</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-neutral-400 mt-0.5">Click any card to inspect full impact metrics &amp; execution details</p>
+        </div>
+      </div>
+
+      <div id="row-experience" class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- ROW 2: Top Picks for Recruiters: Live Projects -->
+    <section id="projects" class="scroll-mt-24">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span>Top Picks for Recruiters: Live Projects</span>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">Verified Alpha</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-neutral-400 mt-0.5">Quantitative backtesting, intraday execution &amp; benchmark risk-return studies</p>
+        </div>
+      </div>
+
+      <div id="row-projects" class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- ROW 3: Blockbuster Skills & Tech Stack -->
+    <section id="skills" class="scroll-mt-24">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg sm:text-2xl font-bold text-white tracking-tight">Blockbuster Skills &amp; Tech Stack</h2>
+          <p class="text-xs sm:text-sm text-neutral-400 mt-0.5">Click any category card to view full competencies &amp; platform proficiency</p>
+        </div>
+      </div>
+
+      <div id="row-skills" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- ROW 4: Certifications & Education -->
+    <section id="education" class="scroll-mt-24">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg sm:text-2xl font-bold text-white tracking-tight">Certifications &amp; Education</h2>
+          <p class="text-xs sm:text-sm text-neutral-400 mt-0.5">Academic credentials &amp; NISM regulatory certification</p>
+        </div>
+      </div>
+
+      <div id="row-education" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-neutral-800/90 bg-[#0f0f0f] py-12 px-4 sm:px-8 lg:px-12">
+    <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+      <div>
+        <div class="font-display text-3xl text-[#E50914] tracking-wider">ABHINAV SINGH</div>
+        <p class="text-sm text-neutral-400 mt-1 max-w-md">
+          MBA in Financial Markets &bull; B.Tech in Computer Science &amp; Engineering &bull; NISM-Series-V-A Certified
+        </p>
+        <p class="text-xs text-neutral-500 mt-3">
+          Questions? Call or connect directly for Equity Research, Quantitative Analyst, or BFSI Consulting roles.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+        <a href="mailto:abhinavsingh11903031@gmail.com" class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#181818] hover:bg-neutral-800 border border-neutral-700 text-xs sm:text-sm text-neutral-200 transition">
+          <i data-lucide="mail" class="w-4 h-4 text-[#E50914]"></i>
+          <span>abhinavsingh11903031@gmail.com</span>
+        </a>
+        <a href="tel:+919760544130" class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#181818] hover:bg-neutral-800 border border-neutral-700 text-xs sm:text-sm text-neutral-200 transition">
+          <i data-lucide="phone" class="w-4 h-4 text-emerald-400"></i>
+          <span>+91-9760544130</span>
+        </a>
+        <a href="https://www.linkedin.com/in/abhinav160204" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#181818] hover:bg-neutral-800 border border-neutral-700 text-xs sm:text-sm text-neutral-200 transition">
+          <i data-lucide="linkedin" class="w-4 h-4 text-blue-400"></i>
+          <span>linkedin.com/in/abhinav160204</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: NETFLIX EPISODE / CARD DETAIL MODAL                          -->
+  <!-- ===================================================================== -->
+  <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="closeDetailModal(event)">
+    <div class="relative w-full max-w-3xl bg-[#181818] border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden my-auto" onclick="event.stopPropagation()">
+      <!-- Modal Banner Header -->
+      <div id="modal-banner" class="relative p-6 sm:p-8 bg-gradient-to-br from-[#2a080a] via-[#181818] to-[#141414] border-b border-neutral-800">
+        <button onclick="closeDetailModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center border border-white/15 transition" aria-label="Close modal">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="flex flex-wrap items-center gap-2 mb-2.5">
+          <span id="modal-category-badge" class="px-2.5 py-0.5 rounded bg-[#E50914] text-white text-xs font-bold uppercase tracking-wider">Experience</span>
+          <span id="modal-match" class="text-emerald-400 text-xs sm:text-sm font-bold">99% Match</span>
+          <span id="modal-period" class="text-neutral-300 text-xs sm:text-sm">Jan 2023 – Present</span>
+        </div>
+
+        <h3 id="modal-title" class="text-2xl sm:text-3xl font-extrabold text-white leading-tight pr-8">Title</h3>
+        <p id="modal-subtitle" class="text-sm sm:text-base text-neutral-300 mt-1 font-medium">Subtitle</p>
+
+        <!-- Action Bar inside Modal -->
+        <div class="flex flex-wrap items-center gap-3 mt-5">
+          <button id="modal-bookmark-btn" onclick="toggleCurrentModalBookmark()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black hover:bg-neutral-200 font-bold text-xs sm:text-sm transition">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Add to My List</span>
+          </button>
+          <button onclick="openContactModal()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-600 font-semibold text-xs sm:text-sm transition">
+            <i data-lucide="mail" class="w-4 h-4 text-[#E50914]"></i>
+            <span>Discuss This Role</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 sm:p-8 space-y-6">
+        <!-- Highlight Metric Pills -->
+        <div id="modal-metrics" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Detailed Bullet Points -->
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-neutral-400 font-bold mb-3">Key Highlights &amp; Execution</h4>
+          <ul id="modal-bullets" class="space-y-3 text-sm sm:text-base text-neutral-200 leading-relaxed">
+            <!-- Populated dynamically -->
+          </ul>
+        </div>
+
+        <!-- Tags / Tools -->
+        <div>
+          <h4 class="text-xs uppercase tracking-wider text-neutral-400 font-bold mb-2.5">Tools, Methodologies &amp; Tags</h4>
+          <div id="modal-tags" class="flex flex-wrap gap-2">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Next / Related Episode Navigation -->
+        <div class="pt-4 border-t border-neutral-800 flex items-center justify-between gap-4">
+          <button onclick="navigateModal(-1)" class="flex items-center gap-2 text-xs sm:text-sm text-neutral-300 hover:text-white font-semibold transition">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Previous Title</span>
+          </button>
+          <span id="modal-counter" class="text-xs text-neutral-500">1 of 11</span>
+          <button onclick="navigateModal(1)" class="flex items-center gap-2 text-xs sm:text-sm text-white hover:text-[#E50914] font-semibold transition">
+            <span>Next Episode / Related</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: RESUME / CONTACT MODAL ("View Resume / Contact" & "Hire Me") -->
+  <!-- ===================================================================== -->
+  <div id="contact-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="closeContactModal(event)">
+    <div class="relative w-full max-w-2xl bg-[#181818] border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden my-auto" onclick="event.stopPropagation()">
+      <div class="p-6 sm:p-8 bg-gradient-to-r from-[#E50914]/25 via-[#181818] to-[#181818] border-b border-neutral-800 flex items-start justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-[#E50914]">Direct Outreach &amp; Executive Dossier</span>
+          <h3 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Connect with Abhinav Singh</h3>
+          <p class="text-xs sm:text-sm text-neutral-300 mt-1">Open to Equity Research, Quantitative Analyst, Wealth/Portfolio Management &amp; BFSI Roles</p>
+        </div>
+        <button onclick="closeContactModal()" class="w-9 h-9 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center border border-white/15">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 sm:p-8 space-y-5">
+        <!-- Contact Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <!-- Email -->
+          <div class="p-4 rounded-xl bg-[#141414] border border-neutral-800 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <p class="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold">Email Address</p>
+              <a href="mailto:abhinavsingh11903031@gmail.com" class="text-xs sm:text-sm font-semibold text-white hover:text-[#E50914] truncate block mt-0.5">
+                abhinavsingh11903031@gmail.com
+              </a>
+            </div>
+            <button onclick="copyText('abhinavsingh11903031@gmail.com', 'Email copied to clipboard!')" class="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 shrink-0" title="Copy Email">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Phone -->
+          <div class="p-4 rounded-xl bg-[#141414] border border-neutral-800 flex items-center justify-between gap-2">
+            <div>
+              <p class="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold">Mobile / WhatsApp</p>
+              <a href="tel:+919760544130" class="text-xs sm:text-sm font-semibold text-white hover:text-emerald-400 block mt-0.5">
+                +91-9760544130
+              </a>
+            </div>
+            <button onclick="copyText('+91-9760544130', 'Phone number copied!')" class="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 shrink-0" title="Copy Phone">
+              <i data-lucide="copy" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- LinkedIn -->
+          <div class="p-4 rounded-xl bg-[#141414] border border-neutral-800 flex items-center justify-between gap-2 sm:col-span-2">
+            <div>
+              <p class="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold">LinkedIn Profile</p>
+              <a href="https://www.linkedin.com/in/abhinav160204" target="_blank" rel="noopener noreferrer" class="text-xs sm:text-sm font-semibold text-blue-400 hover:underline block mt-0.5">
+                linkedin.com/in/abhinav160204
+              </a>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="copyText('https://www.linkedin.com/in/abhinav160204', 'LinkedIn URL copied!')" class="p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200" title="Copy LinkedIn">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+              </button>
+              <a href="https://www.linkedin.com/in/abhinav160204" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold">
+                Open
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Copy Full Resume Summary Button -->
+        <div class="p-4 rounded-xl bg-neutral-900/90 border border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <p class="text-sm font-bold text-white">One-Click Recruiter Summary</p>
+            <p class="text-xs text-neutral-400">Copy Abhinav's full executive profile &amp; contact details for ATS or email.</p>
+          </div>
+          <button onclick="copyFullSummary()" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#E50914] hover:bg-[#F40612] text-white text-xs sm:text-sm font-bold transition shrink-0">
+            <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+            <span>Copy Full Summary</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: BIOGRAPHY & CAREER HIGHLIGHTS ("More Info")                  -->
+  <!-- ===================================================================== -->
+  <div id="bio-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="closeBioModal(event)">
+    <div class="relative w-full max-w-2xl bg-[#181818] border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden my-auto" onclick="event.stopPropagation()">
+      <div class="p-6 sm:p-8 border-b border-neutral-800 flex items-start justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Executive Biography</span>
+          <h3 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Where Engineering Meets Alpha</h3>
+        </div>
+        <button onclick="closeBioModal()" class="w-9 h-9 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center border border-white/15">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 sm:p-8 space-y-5 text-sm sm:text-base text-neutral-200 leading-relaxed">
+        <p>
+          Abhinav Singh brings a rare dual-domain edge: a <strong class="text-white">B.Tech in Computer Science &amp; Engineering</strong> paired with an ongoing <strong class="text-white">MBA in Financial Markets</strong> at Lovely Professional University, backed by <strong class="text-emerald-400">NISM-Series-V-A</strong> certification.
+        </p>
+        <p>
+          At <strong class="text-white">Dexian India</strong>, he worked as a Technical Consultant supporting global banking and asset management leaders <strong class="text-white">Fidelity Investments</strong> and <strong class="text-white">Wells Fargo</strong>—validating enterprise financial workflows with SQL and Java at <strong class="text-white">99%+ accuracy</strong> and reducing requirement turnaround times by <strong class="text-white">~20%</strong>.
+        </p>
+        <p>
+          Simultaneously, as an Independent Equity Investor &amp; Quantitative Analyst since January 2023, he scaled a multi-asset portfolio from <strong class="text-emerald-400">₹5.0L to ₹20.0L (4x)</strong>—delivering <strong class="text-white">~49% annualized CAGR</strong> (~74% peak 2-year rolling CAGR) while enforcing strict risk management (&lt;12% maximum drawdown, max 10% single-stock cap, and 1:2.5 minimum risk-reward).
+        </p>
+
+        <div class="pt-3 flex flex-wrap gap-3">
+          <button onclick="closeBioModal(); openContactModal();" class="px-5 py-2.5 rounded-lg bg-[#E50914] hover:bg-[#F40612] text-white font-bold text-sm transition">
+            Get in Touch
+          </button>
+          <button onclick="closeBioModal()" class="px-5 py-2.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-semibold text-sm transition">
+            Back to Browse
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: MY LIST (SHORTLISTED ITEMS FOR RECRUITERS)                   -->
+  <!-- ===================================================================== -->
+  <div id="mylist-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="closeMyListModal(event)">
+    <div class="relative w-full max-w-2xl bg-[#181818] border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden my-auto" onclick="event.stopPropagation()">
+      <div class="p-6 sm:p-8 border-b border-neutral-800 flex items-start justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-[#E50914]">Recruiter Shortlist</span>
+          <h3 class="text-2xl font-extrabold text-white mt-1">My List</h3>
+          <p class="text-xs sm:text-sm text-neutral-400 mt-0.5">Bookmark experiences, projects, or credentials to export your interview talking points</p>
+        </div>
+        <button onclick="closeMyListModal()" class="w-9 h-9 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center border border-white/15">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 sm:p-8">
+        <div id="mylist-items" class="space-y-3">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div id="mylist-actions" class="hidden mt-6 pt-5 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3">
+          <button onclick="clearMyList()" class="text-xs text-neutral-400 hover:text-white underline">Clear All</button>
+          <button onclick="copyShortlist()" class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#E50914] hover:bg-[#F40612] text-white text-xs sm:text-sm font-bold transition">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+            <span>Copy Shortlist Notes</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION DATA & INTERACTIVE LOGIC                                  -->
+  <!-- ===================================================================== -->
+  <script>
+    // Complete structured dataset strictly matching Abhinav Singh's resume
+    const portfolioItems = [
+      // ROW 1: WORK EXPERIENCE
+      {
+        id: 'exp-portfolio',
+        row: 'experience',
+        badge: 'SEASON 2 • LIVE',
+        title: 'Self-Managed Equity & Derivatives Portfolio',
+        subtitle: 'Independent Equity Investor & Quantitative Analyst • Agra / Phagwara',
+        period: 'Jan 2023 – Present',
+        match: '99% Match',
+        accentGradient: 'from-emerald-950/80 via-[#181818] to-[#181818]',
+        highlightStat: '₹5.0L → ₹20.0L (4x) • ~49% CAGR',
+        summary: 'Scaled a multi-asset portfolio 4x over 3.5+ years across Indian equities, mutual funds, precious metals, and real estate, outperforming NIFTY 50 benchmarks with <12% max drawdown.',
+        metrics: [
+          { label: 'Capital Appreciation', value: '4x (₹5L → ₹20L)' },
+          { label: 'Annualized CAGR', value: '~49% (74% Peak 2Y)' },
+          { label: 'Max Drawdown Cap', value: '< 12%' }
+        ],
+        bullets: [
+          'Scaled a self-managed, multi-asset portfolio from ₹5.0L to ₹20.0L (4x capital appreciation) over 3.5+ years across Indian equities, mutual funds (equity, debt, and hybrid), precious metals (gold and silver), and real estate, generating ~49% annualized CAGR (~74% peak 2-year rolling CAGR) and outperforming NIFTY 50 benchmarks.',
+          'Evaluated 40+ NSE-listed companies in Microsoft Excel using 5-year historical financial statements and relative multiples (P/E, EV/EBITDA, P/B, ROE, ROCE, Debt-to-Equity) via Screener.in and TradingView.',
+          'Enforced strict position sizing (max 10% allocation per stock, 1:2.5 minimum risk-reward ratio, and trailing stop-losses) on TradingView and Zerodha Kite, capping maximum drawdown under 12%.'
+        ],
+        tags: ['Equities & Derivatives', 'Multi-Asset Allocation', '40+ NSE Companies', 'Screener.in', 'TradingView', 'Zerodha Kite', 'Microsoft Excel', 'Risk Management']
+      },
+      {
+        id: 'exp-dexian',
+        row: 'experience',
+        badge: 'SEASON 1 • BFSI',
+        title: 'Dexian India — BFSI Consulting',
+        subtitle: 'Technical Consultant (Clients: Fidelity Investments, Wells Fargo) • Pune, Maharashtra',
+        period: 'May 2023 – June 2024',
+        match: '98% Match',
+        accentGradient: 'from-red-950/70 via-[#181818] to-[#181818]',
+        highlightStat: '99%+ Data Accuracy • ~20% Faster Turnaround',
+        summary: 'Delivered business requirement analysis, SQL/Java workflow validation, and executive Excel sprint dashboards for Fortune 500 financial clients Fidelity Investments and Wells Fargo.',
+        metrics: [
+          { label: 'Data Accuracy', value: '99%+ UAT & Prod' },
+          { label: 'Turnaround Gain', value: '~20% Faster' },
+          { label: 'Enterprise Clients', value: 'Fidelity & Wells Fargo' }
+        ],
+        bullets: [
+          'Gathered, analyzed, and documented business and technical requirements across 3+ BFSI modules using JIRA and Confluence, reducing requirement turnaround time by ~20%.',
+          'Queried and validated enterprise financial workflow records using SQL and Java-based backend services, maintaining 99%+ data accuracy across UAT and production deployments.',
+          'Built sprint tracking and defect-resolution dashboards in Microsoft Excel for client stakeholders at Fidelity Investments and Wells Fargo to support on-time release sign-offs.'
+        ],
+        tags: ['Fidelity Investments', 'Wells Fargo', 'SQL', 'Java', 'JIRA & Confluence', 'Microsoft Excel Dashboards', 'BFSI Domain', 'UAT Validation']
+      },
+
+      // ROW 2: LIVE PROJECTS
+      {
+        id: 'proj-intraday',
+        row: 'projects',
+        badge: 'LIVE PROJECT • LPU',
+        title: 'Intraday Equity Trading & Technical Confluence',
+        subtitle: 'Lovely Professional University • Quantitative Execution & Backtesting',
+        period: 'Sep 2026 – Sep 2026',
+        match: '99% Match',
+        accentGradient: 'from-emerald-950/70 via-[#181818] to-[#181818]',
+        highlightStat: '+₹27,263.53 Net P&L • 66.7% Win Rate',
+        summary: 'Backtested and executed 24 intraday trades across 15 Indian equities on TradingView using a 7-indicator confluence framework and R4/R5 institutional exhaustion filters.',
+        metrics: [
+          { label: 'Net Realized P&L', value: '+₹27,263.53' },
+          { label: 'Win Rate', value: '66.7% (24 Trades)' },
+          { label: 'Universe', value: '15 Indian Equities' }
+        ],
+        bullets: [
+          'Backtested and executed 24 intraday trades across 15 Indian equities using TradingView, achieving +₹27,263.53 net P&L and a 66.7% win rate via multi-indicator confluence (9/26 EMA, Pivot Points, VWAP, RSI, MACD, MFI, and Keltner Channels).',
+          'Mitigated slippage and false-breakout drawdowns during volatile 5-minute sessions through predefined stop-loss rules and institutional exhaustion filtering at extreme R4/R5 pivot levels.'
+        ],
+        tags: ['9/26 EMA', 'VWAP', 'RSI & MACD', 'MFI', 'Keltner Channels', 'R4/R5 Pivot Points', 'TradingView', '5-Min Execution']
+      },
+      {
+        id: 'proj-nifty',
+        row: 'projects',
+        badge: 'EQUITY RESEARCH',
+        title: 'NIFTY 50 vs. Large-Cap Peers Risk-Return Study',
+        subtitle: 'Comparative Technical & Risk-Return Assessment • Quantitative Benchmarking',
+        period: 'Sep 2026 – Sep 2026',
+        match: '97% Match',
+        accentGradient: 'from-blue-950/70 via-[#181818] to-[#181818]',
+        highlightStat: 'Beta, Volatility, Correlation & Alpha Modeling',
+        summary: 'Comparative risk-return and sector rotation analysis across Infosys, InterGlobe Aviation, and Marico benchmarked against the NIFTY 50 index in Microsoft Excel.',
+        metrics: [
+          { label: 'Benchmark Index', value: 'NIFTY 50' },
+          { label: 'Peers Analyzed', value: 'INFY, INDIGO, MARICO' },
+          { label: 'Core Output', value: 'Risk-Adjusted Alpha' }
+        ],
+        bullets: [
+          'Produced a comparative risk-return and sector rotation analysis across Infosys, InterGlobe Aviation, and Marico benchmarked against the NIFTY 50 index.',
+          'Computed beta, annualized volatility, correlation matrices, and relative strength in Microsoft Excel to quantify risk-adjusted alpha.'
+        ],
+        tags: ['NIFTY 50', 'Infosys', 'InterGlobe Aviation', 'Marico', 'Beta & Volatility', 'Correlation Matrix', 'Relative Strength', 'Microsoft Excel']
+      },
+
+      // ROW 3: SKILLS & TECH STACK
+      {
+        id: 'skill-valuation',
+        row: 'skills',
+        badge: 'CORE FINANCE',
+        title: 'Financial Modeling & Valuation',
+        subtitle: 'Fundamental Analysis & Portfolio Risk',
+        period: 'Technical Skillset',
+        match: '99% Match',
+        accentGradient: 'from-red-950/60 via-[#181818] to-[#181818]',
+        highlightStat: 'DCF • EV/EBITDA • ROE/ROCE • Drawdown',
+        summary: 'Institutional-grade valuation frameworks, financial statement decomposition, and quantitative portfolio risk-return modeling.',
+        metrics: [
+          { label: 'Valuation', value: 'DCF & Relative' },
+          { label: 'Multiples', value: 'P/E, EV/EBITDA, P/B' },
+          { label: 'Profitability', value: 'ROE, ROCE, D/E' }
+        ],
+        bullets: [
+          'DCF Valuation & Relative Valuation (P/E, EV/EBITDA, P/B, ROE, ROCE, Debt-to-Equity).',
+          '5-Year Historical Financial Statement & Ratio Analysis across 40+ NSE-listed companies.',
+          'Portfolio Management, Position Sizing, and Risk-Return & Drawdown Analysis.'
+        ],
+        tags: ['DCF Valuation', 'P/E & EV/EBITDA', 'P/B Ratio', 'ROE & ROCE', 'Debt-to-Equity', 'Financial Statement Analysis', 'Drawdown Analysis']
+      },
+      {
+        id: 'skill-technical',
+        row: 'skills',
+        badge: 'QUANT & CHARTS',
+        title: 'Technical & Quantitative Analysis',
+        subtitle: 'Multi-Indicator Confluence & Backtesting',
+        period: 'Technical Skillset',
+        match: '98% Match',
+        accentGradient: 'from-emerald-950/60 via-[#181818] to-[#181818]',
+        highlightStat: 'RSI • MACD • VWAP • EMA • Bollinger',
+        summary: 'Systematic multi-timeframe technical analysis combining momentum, volume-weighted institutional levels, and volatility bands.',
+        metrics: [
+          { label: 'Momentum', value: 'RSI, MACD, MFI' },
+          { label: 'Trend & Levels', value: '9/26 EMA, VWAP, Pivots' },
+          { label: 'Volatility', value: 'Bollinger & Keltner' }
+        ],
+        bullets: [
+          'Multi-Indicator Technical Analysis: RSI, MACD, VWAP, EMA (9/26), Bollinger Bands, Pivot Points (R4/R5), MFI, and Keltner Channels.',
+          'Equity Research, Sector Rotation Studies, and Intraday Strategy Backtesting.'
+        ],
+        tags: ['RSI', 'MACD', 'VWAP', 'EMA', 'Bollinger Bands', 'Pivot Points', 'MFI', 'Keltner Channels', 'Equity Research']
+      },
+      {
+        id: 'skill-tools',
+        row: 'skills',
+        badge: 'STACK & PLATFORMS',
+        title: 'Tools, Platforms & Code',
+        subtitle: 'Financial Terminals & Programming Languages',
+        period: 'Tools & Engineering',
+        match: '99% Match',
+        accentGradient: 'from-blue-950/60 via-[#181818] to-[#181818]',
+        highlightStat: 'Excel Macros • SQL • Python • Java',
+        summary: 'End-to-end command of financial modeling spreadsheets, Indian market execution terminals, and backend data querying.',
+        metrics: [
+          { label: 'Excel Suite', value: 'Modeling, XLOOKUP, Macros' },
+          { label: 'Market Tools', value: 'TradingView, Kite, Screener' },
+          { label: 'Languages', value: 'SQL, Python, Java' }
+        ],
+        bullets: [
+          'Microsoft Excel: Financial Modelling, Pivot Tables, XLOOKUP, and Macros.',
+          'Market & Research Platforms: TradingView, Zerodha Kite, and Screener.in.',
+          'Programming & Enterprise Workflow: SQL, Python, Java, JIRA, and Confluence.'
+        ],
+        tags: ['Microsoft Excel', 'Pivot Tables & XLOOKUP', 'Macros', 'TradingView', 'Zerodha Kite', 'Screener.in', 'SQL', 'Python', 'Java']
+      },
+      {
+        id: 'skill-power',
+        row: 'skills',
+        badge: 'LEADERSHIP',
+        title: 'Power & Leadership Skills',
+        subtitle: 'Decision Making & Stakeholder Execution',
+        period: 'Core Competencies',
+        match: '97% Match',
+        accentGradient: 'from-amber-950/60 via-[#181818] to-[#181818]',
+        highlightStat: 'Ownership • Critical Thinking • Judgment',
+        summary: 'High-accountability execution honed across Fortune 500 client delivery and disciplined personal capital management.',
+        metrics: [
+          { label: 'Execution', value: 'Ownership & Detail' },
+          { label: 'Cognition', value: 'Analytical & Critical' },
+          { label: 'Collaboration', value: 'Stakeholder Mgmt' }
+        ],
+        bullets: [
+          'Analytical Thinker, Critical Thinker, Attention to Detail, Problem Solver, and Independent Judgment.',
+          'Ownership, Communication, Stakeholder Management, Time Management, Decision Making, and Adaptability.'
+        ],
+        tags: ['Analytical Thinker', 'Critical Thinker', 'Attention to Detail', 'Independent Judgment', 'Ownership', 'Stakeholder Management', 'Decision Making']
+      },
+
+      // ROW 4: CERTIFICATIONS & EDUCATION
+      {
+        id: 'edu-nism',
+        row: 'education',
+        badge: 'CERTIFICATION',
+        title: 'NISM-Series-V-A: Mutual Fund Distributors Certification',
+        subtitle: 'National Institute of Securities Markets (SEBI)',
+        period: 'Oct 2026',
+        match: 'Certified',
+        accentGradient: 'from-emerald-950/70 via-[#181818] to-[#181818]',
+        highlightStat: 'Issued Oct 2026 • Regulatory Credential',
+        summary: 'Validated expertise in Indian mutual fund structures, regulatory compliance, risk-return profiling, and investor asset allocation.',
+        metrics: [
+          { label: 'Credential', value: 'NISM-Series-V-A' },
+          { label: 'Issued', value: 'October 2026' },
+          { label: 'Domain', value: 'Mutual Funds & Advisory' }
+        ],
+        bullets: [
+          'Certified in Mutual Fund distribution, NAV computation, taxation, regulatory frameworks, and asset allocation strategies across equity, debt, and hybrid funds.'
+        ],
+        tags: ['NISM-Series-V-A', 'Mutual Funds', 'SEBI Regulations', 'Asset Allocation']
+      },
+      {
+        id: 'edu-mba',
+        row: 'education',
+        badge: 'POSTGRADUATE',
+        title: 'MBA — Financial Markets',
+        subtitle: 'Lovely Professional University • Phagwara, Punjab',
+        period: 'Aug 2026 – Present',
+        match: 'In Progress',
+        accentGradient: 'from-red-950/70 via-[#181818] to-[#181818]',
+        highlightStat: 'Specialization: Financial Markets',
+        summary: 'Pursuing Master of Business Administration specializing in Financial Markets, equity valuation, derivatives, and institutional portfolio management.',
+        metrics: [
+          { label: 'Degree', value: 'MBA (Financial Markets)' },
+          { label: 'Institution', value: 'LPU, Punjab' },
+          { label: 'Timeline', value: 'Aug 2026 – Present' }
+        ],
+        bullets: [
+          'Master of Business Administration — Financial Markets at Lovely Professional University, Phagwara, Punjab (Aug 2026 – Present).'
+        ],
+        tags: ['MBA Financial Markets', 'Lovely Professional University', 'Capital Markets', 'Derivatives']
+      },
+      {
+        id: 'edu-btech',
+        row: 'education',
+        badge: 'UNDERGRADUATE',
+        title: 'B.Tech — Computer Science & Engineering',
+        subtitle: 'Lovely Professional University • Phagwara, Punjab',
+        period: 'Jul 2019 – May 2023',
+        match: 'Graduated',
+        accentGradient: 'from-blue-950/70 via-[#181818] to-[#181818]',
+        highlightStat: 'Computer Science & Engineering Foundation',
+        summary: 'Four-year engineering degree building strong foundations in SQL, Python, Java, algorithms, and quantitative problem-solving.',
+        metrics: [
+          { label: 'Degree', value: 'B.Tech (CSE)' },
+          { label: 'Institution', value: 'LPU, Punjab' },
+          { label: 'Timeline', value: 'Jul 2019 – May 2023' }
+        ],
+        bullets: [
+          'Bachelor of Technology — Computer Science & Engineering from Lovely Professional University, Phagwara, Punjab (Jul 2019 – May 2023).'
+        ],
+        tags: ['B.Tech CSE', 'Computer Science', 'SQL & Java', 'Python', 'Lovely Professional University']
+      }
+    ];
+
+    // State
+    let currentModalIndex = 0;
+    let myList = new Set(['exp-portfolio', 'exp-dexian']); // Pre-seed 2 top items so recruiters can immediately see how My List works
+
+    // Initialize UI on DOM Load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAllRows();
+      updateMyListBadge();
+      lucide.createIcons();
+
+      // Navbar scroll background transition
+      window.addEventListener('scroll', () => {
+        const nav = document.getElementById('navbar');
+        if (window.scrollY > 30) {
+          nav.classList.add('bg-[#141414]/95', 'backdrop-blur-md', 'shadow-lg');
+          nav.classList.remove('bg-gradient-to-b');
+        } else {
+          nav.classList.remove('bg-[#141414]/95', 'backdrop-blur-md', 'shadow-lg');
+          nav.classList.add('bg-gradient-to-b');
+        }
+      });
+
+      // Close profile menu when clicking outside
+      document.addEventListener('click', (e) => {
+        const container = document.getElementById('profile-dropdown-container');
+        if (container && !container.contains(e.target)) {
+          document.getElementById('profile-menu').classList.add('hidden');
+        }
+      });
+    });
+
+    // Render all 4 Netflix rows
+    function renderAllRows() {
+      renderRow('experience', 'row-experience', true);
+      renderRow('projects', 'row-projects', true);
+      renderRow('skills', 'row-skills', false);
+      renderRow('education', 'row-education', false);
+    }
+
+    function renderRow(rowKey, containerId, isLargeCard) {
+      const container = document.getElementById(containerId);
+      const items = portfolioItems.filter(item => item.row === rowKey);
+
+      container.innerHTML = items.map(item => {
+        const isSaved = myList.has(item.id);
+        return `
+          <article onclick="openDetailModal('${item.id}')"
+            class="netflix-card group relative rounded-xl bg-gradient-to-br ${item.accentGradient} border border-neutral-800 hover:border-[#E50914]/60 p-5 sm:p-6 cursor-pointer flex flex-col justify-between">
+            <div>
+              <!-- Top Meta Row -->
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="px-2.5 py-0.5 rounded bg-black/50 border border-white/10 text-[11px] font-bold tracking-wider uppercase text-neutral-200">
+                  ${item.badge}
+                </span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-emerald-400">${item.match}</span>
+                  <button onclick="event.stopPropagation(); toggleBookmark('${item.id}')"
+                    class="w-8 h-8 rounded-full bg-black/60 hover:bg-white hover:text-black border border-white/20 flex items-center justify-center transition"
+                    title="${isSaved ? 'Remove from My List' : 'Add to My List'}">
+                    <i data-lucide="${isSaved ? 'check' : 'plus'}" class="w-4 h-4 ${isSaved ? 'text-emerald-400' : ''}"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Title & Subtitle -->
+              <h3 class="${isLargeCard ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'} font-extrabold text-white group-hover:text-[#E50914] transition leading-snug">
+                ${item.title}
+              </h3>
+              <p class="text-xs sm:text-sm text-neutral-400 mt-1 font-medium">${item.subtitle}</p>
+              <p class="text-xs text-neutral-500 mt-0.5">${item.period}</p>
+
+              <!-- Highlight Stat Pill -->
+              <div class="mt-3.5 inline-block px-3 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-semibold text-neutral-100">
+                ${item.highlightStat}
+              </div>
+
+              <!-- Concise Summary -->
+              <p class="mt-3 text-xs sm:text-sm text-neutral-300 leading-relaxed line-clamp-3">
+                ${item.summary}
+              </p>
+            </div>
+
+            <!-- Footer Tags & Expand Prompt -->
+            <div class="mt-5 pt-4 border-t border-white/10 flex items-center justify-between gap-2">
+              <div class="flex flex-wrap gap-1.5 overflow-hidden max-h-6">
+                ${item.tags.slice(0, 3).map(tag => `
+                  <span class="text-[11px] px-2 py-0.5 rounded bg-neutral-900/90 text-neutral-300 border border-neutral-800">${tag}</span>
+                `).join('')}
+              </div>
+              <span class="text-xs font-bold text-white group-hover:translate-x-1 transition flex items-center gap-1 shrink-0">
+                <span>Details</span>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-[#E50914]"></i>
+              </span>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Detail Modal Controls
+    function openDetailModal(itemId) {
+      const idx = portfolioItems.findIndex(i => i.id === itemId);
+      if (idx === -1) return;
+      currentModalIndex = idx;
+      populateDetailModal(portfolioItems[idx]);
+
+      const modal = document.getElementById('detail-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    function populateDetailModal(item) {
+      document.getElementById('modal-category-badge').textContent = item.badge;
+      document.getElementById('modal-match').textContent = item.match;
+      document.getElementById('modal-period').textContent = item.period;
+      document.getElementById('modal-title').textContent = item.title;
+      document.getElementById('modal-subtitle').textContent = item.subtitle;
+      document.getElementById('modal-counter').textContent = `${currentModalIndex + 1} of ${portfolioItems.length}`;
+
+      // Metrics
+      document.getElementById('modal-metrics').innerHTML = item.metrics.map(m => `
+        <div class="p-3.5 rounded-xl bg-[#141414] border border-neutral-800">
+          <p class="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold">${m.label}</p>
+          <p class="text-sm sm:text-base font-extrabold text-white mt-0.5">${m.value}</p>
+        </div>
+      `).join('');
+
+      // Bullets
+      document.getElementById('modal-bullets').innerHTML = item.bullets.map(b => `
+        <li class="flex items-start gap-3">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#E50914] mt-2.5 shrink-0"></span>
+          <span>${b}</span>
+        </li>
+      `).join('');
+
+      // Tags
+      document.getElementById('modal-tags').innerHTML = item.tags.map(t => `
+        <span class="px-3 py-1 rounded-full bg-neutral-900 border border-neutral-700 text-xs font-medium text-neutral-200">${t}</span>
+      `).join('');
+
+      updateModalBookmarkButton(item.id);
+    }
+
+    function updateModalBookmarkButton(itemId) {
+      const btn = document.getElementById('modal-bookmark-btn');
+      const isSaved = myList.has(itemId);
+      btn.innerHTML = isSaved
+        ? `<i data-lucide="check" class="w-4 h-4 text-emerald-600"></i><span>In My List</span>`
+        : `<i data-lucide="plus" class="w-4 h-4"></i><span>Add to My List</span>`;
+    }
+
+    function toggleCurrentModalBookmark() {
+      const item = portfolioItems[currentModalIndex];
+      toggleBookmark(item.id);
+      updateModalBookmarkButton(item.id);
+      lucide.createIcons();
+    }
+
+    function navigateModal(direction) {
+      currentModalIndex = (currentModalIndex + direction + portfolioItems.length) % portfolioItems.length;
+      populateDetailModal(portfolioItems[currentModalIndex]);
+      lucide.createIcons();
+    }
+
+    function closeDetailModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      const modal = document.getElementById('detail-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    // Bookmark / My List Management
+    function toggleBookmark(itemId) {
+      if (myList.has(itemId)) {
+        myList.delete(itemId);
+        showToast('Removed from My List');
+      } else {
+        myList.add(itemId);
+        showToast('Added to My List');
+      }
+      updateMyListBadge();
+      renderAllRows();
+      lucide.createIcons();
+    }
+
+    function updateMyListBadge() {
+      document.getElementById('mylist-count').textContent = myList.size;
+    }
+
+    function openMyListModal() {
+      renderMyListItems();
+      const modal = document.getElementById('mylist-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    function closeMyListModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      const modal = document.getElementById('mylist-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    function renderMyListItems() {
+      const container = document.getElementById('mylist-items');
+      const actions = document.getElementById('mylist-actions');
+
+      if (myList.size === 0) {
+        actions.classList.add('hidden');
+        container.innerHTML = `
+          <div class="text-center py-10">
+            <p class="text-neutral-300 font-semibold">Your shortlist is currently empty.</p>
+            <p class="text-xs text-neutral-500 mt-1">Click the "+" icon on any experience, project, or skill card to save it here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      actions.classList.remove('hidden');
+      const savedItems = portfolioItems.filter(i => myList.has(i.id));
+      container.innerHTML = savedItems.map(item => `
+        <div class="p-4 rounded-xl bg-[#141414] border border-neutral-800 flex items-center justify-between gap-4">
+          <div class="min-w-0 cursor-pointer" onclick="closeMyListModal(); openDetailModal('${item.id}')">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#E50914]">${item.badge}</span>
+            <h4 class="text-sm sm:text-base font-bold text-white truncate">${item.title}</h4>
+            <p class="text-xs text-neutral-400 truncate">${item.highlightStat}</p>
+          </div>
+          <button onclick="toggleBookmark('${item.id}'); renderMyListItems();" class="p-2 rounded-lg bg-neutral-800 hover:bg-red-950 text-neutral-300 hover:text-red-400 transition shrink-0" title="Remove">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function clearMyList() {
+      myList.clear();
+      updateMyListBadge();
+      renderAllRows();
+      renderMyListItems();
+      lucide.createIcons();
+    }
+
+    function copyShortlist() {
+      const savedItems = portfolioItems.filter(i => myList.has(i.id));
+      const text = `Abhinav Singh — Shortlisted Highlights:\n` +
+        savedItems.map((item, idx) => `${idx + 1}. ${item.title} (${item.period}) — ${item.highlightStat}`).join('\n') +
+        `\n\nContact: abhinavsingh11903031@gmail.com | +91-9760544130 | linkedin.com/in/abhinav160204`;
+      copyText(text, 'Shortlist notes copied to clipboard!');
+    }
+
+    // Contact & Bio Modals
+    function openContactModal() {
+      const modal = document.getElementById('contact-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    function closeContactModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      const modal = document.getElementById('contact-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    function openBioModal() {
+      const modal = document.getElementById('bio-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    function closeBioModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      const modal = document.getElementById('bio-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    // Profile Switcher Logic
+    function toggleProfileMenu() {
+      document.getElementById('profile-menu').classList.toggle('hidden');
+    }
+
+    function switchProfile(name, initial, gradientClasses, bannerText) {
+      document.getElementById('active-profile-label').textContent = name;
+      const avatar = document.getElementById('active-profile-avatar');
+      avatar.textContent = initial;
+      avatar.className = `w-6 h-6 sm:w-7 sm:h-7 rounded bg-gradient-to-br ${gradientClasses} flex items-center justify-center font-bold text-xs shadow`;
+      document.querySelector('#profile-lens-banner span').textContent = bannerText;
+      document.getElementById('profile-menu').classList.add('hidden');
+      showToast(`Switched profile lens to ${name}`);
+    }
+
+    // Clipboard Helper (using document.execCommand('copy') for iframe compatibility)
+    function copyText(text, successMessage) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMessage);
+      } catch (err) {
+        showToast('Unable to copy text');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function copyFullSummary() {
+      const summary = `ABHINAV SINGH
+Email: abhinavsingh11903031@gmail.com | Mobile: +91-9760544130 | LinkedIn: linkedin.com/in/abhinav160204
+Education: MBA in Financial Markets (LPU, Aug 2026–Present) | B.Tech CSE (LPU, 2019–2023) | NISM-Series-V-A Certified (Oct 2026)
+
+KEY HIGHLIGHTS:
+- Independent Equity Investor & Quantitative Analyst (Jan 2023–Present): Scaled multi-asset portfolio 4x from ₹5.0L to ₹20.0L (~49% annualized CAGR, ~74% peak 2Y rolling CAGR) with <12% max drawdown across 40+ evaluated NSE companies.
+- Technical Consultant at Dexian India (May 2023–June 2024): Supported Fidelity Investments & Wells Fargo across 3+ BFSI modules using SQL, Java, JIRA, Confluence, and Excel dashboards (99%+ data accuracy, ~20% faster requirement turnaround).
+- Live Projects (Sep 2026): Intraday Equity Trading (+₹27,263.53 net P&L, 66.7% win rate across 24 trades) & NIFTY 50 vs. Large-Cap Peers Risk-Return Study.`;
+      copyText(summary, 'Full recruiter summary copied!');
+    }
+
+    // Toast Notification
+    let toastTimeout;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 2800);
+    }
+
+    // Close modals with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeDetailModal();
+        closeContactModal();
+        closeBioModal();
+        closeMyListModal();
+      }
+    });
+  </script>
+</body>
+</html>
